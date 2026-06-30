@@ -55,6 +55,15 @@
             export OPENSSL_LIB_DIR="${pkgs.openssl.out}/lib"
             export OPENSSL_INCLUDE_DIR="${pkgs.openssl.dev}/include"
             
+            if [ -d .git ] && [ -f scripts/setup-hooks.sh ]; then
+              HOOKS_PATH=$(git config --local core.hooksPath 2>/dev/null || echo "")
+              if [ -z "$HOOKS_PATH" ]; then
+                echo "Setting up git hooks..."
+                ./scripts/setup-hooks.sh
+                echo ""
+              fi
+            fi
+            
             echo "F1R3node Rust development environment loaded"
             echo "Rust toolchain: nightly-2026-02-09"
             echo "protoc version: $(protoc --version)"
@@ -64,6 +73,10 @@
             echo "  cargo test            - Run tests"
             echo "  just run-standalone   - Run standalone node"
             echo "  just --list           - Show all just recipes"
+            echo ""
+            echo "Git hooks configured:"
+            echo "  pre-commit: cargo fmt --check, cargo clippy, cargo deny"
+            echo "  pre-push:   cargo test --release"
             echo ""
             echo "Stack size: RUST_MIN_STACK=8388608"
           '';
